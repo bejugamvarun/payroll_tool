@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(where:*)",
+      "Bash(uv init:*)",
+      "Bash(uv add:*)",
+      "Bash(wc -l:*)",
+      "Bash(uv run python:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite build)"
+    ]
+  }
+}
