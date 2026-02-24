@@ -21,6 +21,9 @@ COPY . .
 # Create storage directories
 RUN mkdir -p storage/uploads storage/payslips storage/reports
 
+# Make entrypoint executable
+RUN chmod +x entrypoint.sh
+
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+ENTRYPOINT ["./entrypoint.sh"]

@@ -25,6 +25,7 @@ services:
     container_name: payroll_backend
     environment:
       DATABASE_URL: postgresql://payroll_user:payroll_pass@postgres:5432/payroll_db
+      PGPASSWORD: payroll_pass
       STORAGE_PATH: /app/storage
     ports:
       - "8000:8000"
@@ -34,7 +35,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
     build:
