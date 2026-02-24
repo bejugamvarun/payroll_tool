@@ -42,9 +42,6 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Docker
-.dockerignore
-
 # Storage
 backend/storage/uploads/*
 !backend/storage/uploads/.gitkeep

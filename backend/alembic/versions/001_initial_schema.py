@@ -8,6 +8,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import ENUM as PgENUM
 
 
 # revision identifiers, used by Alembic.
@@ -17,17 +18,29 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def upgrade() -> None:
-    # Enums
-    componenttype = sa.Enum('EARNING', 'DEDUCTION', name='componenttype')
-    uploadstatus = sa.Enum('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', name='uploadstatus')
-    attendancestatus = sa.Enum('PRESENT', 'ABSENT', 'HALF_DAY', 'WEEKEND_WORK', 'HOLIDAY', 'LEAVE', name='attendancestatus')
-    payrollcyclestatus = sa.Enum('DRAFT', 'PROCESSING', 'COMPLETED', 'LOCKED', name='payrollcyclestatus')
+def create_enum_if_not_exists(name: str, *values: str) -> None:
+    """Create a PostgreSQL enum type only if it doesn't already exist."""
+    op.execute(f"""
+        DO $$ BEGIN
+            CREATE TYPE {name} AS ENUM ({', '.join(f"'{v}'" for v in values)});
+        EXCEPTION WHEN duplicate_object THEN null;
+        END $$;
+    """)
 
-    componenttype.create(op.get_bind(), checkfirst=True)
-    uploadstatus.create(op.get_bind(), checkfirst=True)
-    attendancestatus.create(op.get_bind(), checkfirst=True)
-    payrollcyclestatus.create(op.get_bind(), checkfirst=True)
+
+def upgrade() -> None:
+    # Create enum types idempotently using DO blocks
+    create_enum_if_not_exists('componenttype', 'EARNING', 'DEDUCTION')
+    create_enum_if_not_exists('uploadstatus', 'PENDING', 'PROCESSING', 'COMPLETED', 'FAILED')
+    create_enum_if_not_exists('attendancestatus', 'PRESENT', 'ABSENT', 'HALF_DAY', 'WEEKEND_WORK', 'HOLIDAY', 'LEAVE')
+    create_enum_if_not_exists('payrollcyclestatus', 'DRAFT', 'PROCESSING', 'COMPLETED', 'LOCKED')
+
+    # Use postgresql.ENUM(create_type=False) so SQLAlchemy does NOT try to
+    # auto-create the enum types during create_table (they already exist above)
+    componenttype = PgENUM('EARNING', 'DEDUCTION', name='componenttype', create_type=False)
+    uploadstatus = PgENUM('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', name='uploadstatus', create_type=False)
+    attendancestatus = PgENUM('PRESENT', 'ABSENT', 'HALF_DAY', 'WEEKEND_WORK', 'HOLIDAY', 'LEAVE', name='attendancestatus', create_type=False)
+    payrollcyclestatus = PgENUM('DRAFT', 'PROCESSING', 'COMPLETED', 'LOCKED', name='payrollcyclestatus', create_type=False)
 
     # 1. colleges
     op.create_table(
@@ -315,7 +328,7 @@ def downgrade() -> None:
     op.drop_table('departments')
     op.drop_table('colleges')
 
-    sa.Enum(name='payrollcyclestatus').drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name='attendancestatus').drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name='uploadstatus').drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name='componenttype').drop(op.get_bind(), checkfirst=True)
+    op.execute('DROP TYPE IF EXISTS payrollcyclestatus')
+    op.execute('DROP TYPE IF EXISTS attendancestatus')
+    op.execute('DROP TYPE IF EXISTS uploadstatus')
+    op.execute('DROP TYPE IF EXISTS componenttype')
