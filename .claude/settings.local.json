@@ -9,7 +9,8 @@
       "Bash(uv run python:*)",
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(cd /c/Users/bejug/Projects/payroll_tool && docker compose down -v && docker compose up --build -d 2>&1)"
     ]
   }
 }

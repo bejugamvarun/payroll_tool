@@ -16,7 +16,7 @@ echo "PostgreSQL is ready."
 # Run Alembic migrations
 echo ""
 echo "Running database migrations..."
-uv run alembic upgrade head
+alembic upgrade head
 echo "Migrations applied successfully."
 
 # Seed data if the database is empty (check if colleges table has rows)
@@ -25,7 +25,7 @@ COLLEGE_COUNT=$(PGPASSWORD=payroll_pass psql -h postgres -U payroll_user -d payr
 if [ "$COLLEGE_COUNT" = "0" ]; then
   echo ""
   echo "Empty database detected - seeding initial data..."
-  uv run python -c "
+  python -c "
 from app.database import SessionLocal
 from app.models import College, Department, Designation, SalaryComponent, ComponentType
 
@@ -90,4 +90,4 @@ echo "  Starting Uvicorn server..."
 echo "============================================"
 
 # Start the application
-exec uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000

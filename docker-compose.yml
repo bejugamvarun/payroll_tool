@@ -30,8 +30,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
-      - ./backend/storage:/app/storage
+      - storage_data:/app/storage
     depends_on:
       postgres:
         condition: service_healthy
@@ -42,14 +41,11 @@ services:
       dockerfile: Dockerfile
     container_name: payroll_frontend
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "5173:80"
     depends_on:
       - backend
-    environment:
-      - VITE_API_URL=http://backend:8000
 
 volumes:
   postgres_data:
+  storage_data:
+
