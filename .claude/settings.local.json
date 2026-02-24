@@ -10,7 +10,10 @@
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vite build)",
-      "Bash(cd /c/Users/bejug/Projects/payroll_tool && docker compose down -v && docker compose up --build -d 2>&1)"
+      "Bash(cd /c/Users/bejug/Projects/payroll_tool && docker compose down -v && docker compose up --build -d 2>&1)",
+      "Bash(cd /c/Users/bejug/Projects/payroll_tool && docker compose down 2>&1)",
+      "Bash(tail:*)",
+      "Bash(cd /c/Users/bejug/Projects/payroll_tool/backend && uv lock 2>&1)"
     ]
   }
 }

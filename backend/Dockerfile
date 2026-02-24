@@ -13,8 +13,6 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
-
 # Copy the pre-built virtualenv from builder
 COPY --from=builder /app/.venv /app/.venv
 

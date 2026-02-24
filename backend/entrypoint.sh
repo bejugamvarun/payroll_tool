@@ -5,12 +5,20 @@ echo "============================================"
 echo "  Aurora Group Payroll - Starting Up"
 echo "============================================"
 
-# Wait for postgres to be fully ready (belt-and-suspenders on top of healthcheck)
+# Wait for postgres using Python/psycopg2 (no postgresql-client needed)
 echo "Waiting for PostgreSQL..."
-until pg_isready -h postgres -U payroll_user -d payroll_db -q; do
-  echo "  PostgreSQL not ready yet, retrying in 2s..."
-  sleep 2
-done
+python -c "
+import time, psycopg2, os
+dsn = os.environ['DATABASE_URL']
+while True:
+    try:
+        conn = psycopg2.connect(dsn)
+        conn.close()
+        break
+    except psycopg2.OperationalError:
+        print('  PostgreSQL not ready yet, retrying in 2s...')
+        time.sleep(2)
+"
 echo "PostgreSQL is ready."
 
 # Run Alembic migrations
@@ -19,8 +27,15 @@ echo "Running database migrations..."
 alembic upgrade head
 echo "Migrations applied successfully."
 
-# Seed data if the database is empty (check if colleges table has rows)
-COLLEGE_COUNT=$(PGPASSWORD=payroll_pass psql -h postgres -U payroll_user -d payroll_db -tAc "SELECT count(*) FROM colleges;" 2>/dev/null || echo "0")
+# Seed data if the database is empty
+COLLEGE_COUNT=$(python -c "
+import psycopg2, os
+conn = psycopg2.connect(os.environ['DATABASE_URL'])
+cur = conn.cursor()
+cur.execute('SELECT count(*) FROM colleges')
+print(cur.fetchone()[0])
+conn.close()
+" 2>/dev/null || echo "0")
 
 if [ "$COLLEGE_COUNT" = "0" ]; then
   echo ""
@@ -89,5 +104,4 @@ echo "============================================"
 echo "  Starting Uvicorn server..."
 echo "============================================"
 
-# Start the application
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000

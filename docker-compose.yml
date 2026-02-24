@@ -25,7 +25,6 @@ services:
     container_name: payroll_backend
     environment:
       DATABASE_URL: postgresql://payroll_user:payroll_pass@postgres:5432/payroll_db
-      PGPASSWORD: payroll_pass
       STORAGE_PATH: /app/storage
     ports:
       - "8000:8000"
