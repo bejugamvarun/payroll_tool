@@ -2,8 +2,8 @@ from app.database import Base
 from app.models.colleges import College
 from app.models.departments import Department
 from app.models.designations import Designation
-from app.models.salary_components import SalaryComponent, ComponentType
-from app.models.employees import Employee
+from app.models.salary_components import SalaryComponent, ComponentType, AppliesTo
+from app.models.employees import Employee, StaffType
 from app.models.employee_salary_structures import EmployeeSalaryStructure
 from app.models.leave_policies import LeavePolicy
 from app.models.employee_leave_balances import EmployeeLeaveBalance
@@ -23,7 +23,9 @@ __all__ = [
     "Designation",
     "SalaryComponent",
     "ComponentType",
+    "AppliesTo",
     "Employee",
+    "StaffType",
     "EmployeeSalaryStructure",
     "LeavePolicy",
     "EmployeeLeaveBalance",

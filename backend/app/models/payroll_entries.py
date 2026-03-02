@@ -18,8 +18,9 @@ class PayrollEntry(Base):
     days_absent = Column(Numeric(5, 2), nullable=False)
     paid_leaves_used = Column(Numeric(5, 2), default=0, nullable=False)
     comp_leaves_used = Column(Numeric(5, 2), default=0, nullable=False)
-    unpaid_leaves = Column(Numeric(5, 2), default=0, nullable=False)
+    lop_days = Column(Numeric(5, 2), default=0, nullable=False)
     loss_of_pay = Column(Numeric(12, 2), default=0, nullable=False)
+    arrears = Column(Numeric(12, 2), default=0, nullable=False)
 
     gross_earnings = Column(Numeric(12, 2), nullable=False)
     total_deductions = Column(Numeric(12, 2), nullable=False)
